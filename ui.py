@@ -28,15 +28,17 @@ class Ui_MainWindow(object):
         self.plist.setViewMode(QListWidget.IconMode)
         self.plist.setMovement(QListWidget.Free)
         self.plist.setSpacing(10)
-        # self.plist.setAcceptDrops(False)
+        self.plist.setAcceptDrops(False)
+        self.plist.setDragEnabled(True)
+        
 
-        self.rlist = QListWidget(self)
-        self.rlist.setGeometry(0.45*self.screenWidth+50,0.15*self.screenHeight,
-                                0.42*self.screenWidth,0.42*self.screenWidth)
-        self.rlist.setViewMode(QListWidget.IconMode)
-        self.rlist.setMovement(QListWidget.Static)
-        self.rlist.setSpacing(2)
-        self.rlist.setAcceptDrops(True)
+        # self.rlist = QListWidget(self)
+        # self.rlist.setGeometry(0.45*self.screenWidth+50,0.15*self.screenHeight,
+        #                         0.42*self.screenWidth,0.42*self.screenWidth)
+        # self.rlist.setViewMode(QListWidget.IconMode)
+        # self.rlist.setMovement(QListWidget.Static)
+        # self.rlist.setSpacing(2)
+        # self.rlist.setAcceptDrops(True)
 
         
     def retranslateUi(self, MainWindow):
