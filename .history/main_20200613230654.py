@@ -86,50 +86,10 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
         # res.paste(p2,(0,p1.size[1]))
         # print(res.size)
         # res.save('new.jpg')
+        pass
         
-        rows = 0#有图的行数
-        cols = None #暂存上一行的图数量 列数
         
-        for i in range(len(self.worklist)):
-            if self.worklist[i].count(None) != 3:
-                rows+=1
-                if not cols:
-                    cols = 3-self.worklist[i].count(None)
-                else:
-                    if 3-self.worklist[i].count(None)!= cols:
-                        QMessageBox.about(self,"提示","图片数量不符合要求")
-                        return
-        
-        if rows == 0:
-            QMessageBox.about(self,"提示","无图片")
-            return
-            
-                        
-        img = Image.open('wait-to-merge/'+self.worklist[0][0],'r')
-        format_ = img.format
-        width = img.size[0]
-        height = img.size[1]
 
-        IMAGES_PATH = 'wait-to-merge\\'
-        IMAGE_SAVE_PATH = 'results\\'
-        to_image = Image.new('RGB', (cols * width, rows * height))  # 创建一个新图
-        # 循环遍历，把每张图片按顺序粘贴到对应位置上
-        for x in range(rows):
-            for y in range(cols):
-                from_image = Image.open(IMAGES_PATH + self.worklist[x][y]).resize(
-                    (width, height), Image.ANTIALIAS)
-                to_image.paste(from_image, (y * width, x * height))
-        
-        fileno = len(os.listdir('results'))
-        to_image.save(IMAGE_SAVE_PATH + str(fileno) + '.' + format_)  # 保存新图
-        print('新图片生成')
-        
-        self.worklist = [[None,None,None],
-                         [None,None,None],
-                         [None,None,None]] 
-        
-        self.rlist.clearContents()
-        
 class rlist(QTableWidget):
     def __init__(self,parent=None):
         super().__init__(parent) 
@@ -186,7 +146,7 @@ class rlist(QTableWidget):
         self.setItem(row, col, newItem)
         self.window.worklist[row][col] = items[0].text()
         self.window.waitlist.remove(items[0].text())
-        source_Widget.takeItem(source_Widget.currentRow())
+        source_Widget.takeItem(source_Widget.selectedIndexes())
         
     def whichgrid(self, x, y):
         size = int(self.size().width()/3)
@@ -201,5 +161,3 @@ if __name__ == "__main__":
     win = Mainwindow()
     win.show()
     sys.exit(app.exec_())
-    
-    #TODO:设置撤销缓存区 右端图片可换位

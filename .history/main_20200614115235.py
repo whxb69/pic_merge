@@ -120,7 +120,7 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
                     (width, height), Image.ANTIALIAS)
                 to_image.paste(from_image, (y * width, x * height))
         
-        fileno = len(os.listdir('results'))
+        fileno = len(os.listdir('merged'))
         to_image.save(IMAGE_SAVE_PATH + str(fileno) + '.' + format_)  # 保存新图
         print('新图片生成')
         
@@ -201,5 +201,3 @@ if __name__ == "__main__":
     win = Mainwindow()
     win.show()
     sys.exit(app.exec_())
-    
-    #TODO:设置撤销缓存区 右端图片可换位

@@ -114,13 +114,13 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
         IMAGE_SAVE_PATH = 'results\\'
         to_image = Image.new('RGB', (cols * width, rows * height))  # 创建一个新图
         # 循环遍历，把每张图片按顺序粘贴到对应位置上
-        for x in range(rows):
-            for y in range(cols):
+        for y in range(rows):
+            for x in range(cols):
                 from_image = Image.open(IMAGES_PATH + self.worklist[x][y]).resize(
                     (width, height), Image.ANTIALIAS)
-                to_image.paste(from_image, (y * width, x * height))
+                to_image.paste(from_image, (x * width, y * height))
         
-        fileno = len(os.listdir('results'))
+        fileno = len(os.listdir('merged'))
         to_image.save(IMAGE_SAVE_PATH + str(fileno) + '.' + format_)  # 保存新图
         print('新图片生成')
         
@@ -201,5 +201,3 @@ if __name__ == "__main__":
     win = Mainwindow()
     win.show()
     sys.exit(app.exec_())
-    
-    #TODO:设置撤销缓存区 右端图片可换位

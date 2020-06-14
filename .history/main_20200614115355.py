@@ -201,5 +201,3 @@ if __name__ == "__main__":
     win = Mainwindow()
     win.show()
     sys.exit(app.exec_())
-    
-    #TODO:设置撤销缓存区 右端图片可换位

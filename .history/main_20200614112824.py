@@ -98,38 +98,30 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
                 else:
                     if 3-self.worklist[i].count(None)!= cols:
                         QMessageBox.about(self,"提示","图片数量不符合要求")
-                        return
-        
-        if rows == 0:
-            QMessageBox.about(self,"提示","无图片")
-            return
-            
                         
         img = Image.open('wait-to-merge/'+self.worklist[0][0],'r')
         format_ = img.format
         width = img.size[0]
         height = img.size[1]
 
+            
+        
         IMAGES_PATH = 'wait-to-merge\\'
         IMAGE_SAVE_PATH = 'results\\'
-        to_image = Image.new('RGB', (cols * width, rows * height))  # 创建一个新图
+        to_image = Image.new('RGB', (cols * height, rows * width))  # 创建一个新图
         # 循环遍历，把每张图片按顺序粘贴到对应位置上
-        for x in range(rows):
-            for y in range(cols):
+        for y in range(rows):
+            for x in range(cols):
                 from_image = Image.open(IMAGES_PATH + self.worklist[x][y]).resize(
                     (width, height), Image.ANTIALIAS)
-                to_image.paste(from_image, (y * width, x * height))
+                to_image.paste(from_image, ((x - 1) * width, (y - 1) * height))
         
-        fileno = len(os.listdir('results'))
-        to_image.save(IMAGE_SAVE_PATH + str(fileno) + '.' + format_)  # 保存新图
+        fileno = len(os.listdir('merged'))
+        to_image.save(IMAGE_SAVE_PATH + fileno+'.' + format_)  # 保存新图
         print('新图片生成')
         
-        self.worklist = [[None,None,None],
-                         [None,None,None],
-                         [None,None,None]] 
         
-        self.rlist.clearContents()
-        
+
 class rlist(QTableWidget):
     def __init__(self,parent=None):
         super().__init__(parent) 
@@ -201,5 +193,3 @@ if __name__ == "__main__":
     win = Mainwindow()
     win.show()
     sys.exit(app.exec_())
-    
-    #TODO:设置撤销缓存区 右端图片可换位

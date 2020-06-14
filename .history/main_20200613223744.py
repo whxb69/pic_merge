@@ -61,15 +61,15 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
                 return True
             else:
                 return False
-
+        pic= []
         #将图片加入工作列表
-        for item in os.listdir('wait-to-merge'):
+        for item in os.listdir(os.getcwd()):
             if is_img(os.path.splitext(item)[1]):
-                pic = QPixmap('wait-to-merge/'+item)
-                pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(120,120))), item)
+                pic = QPixmap(item)
+                pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(120,120))),os.path.splitext(item)[0])
                 pitem.setSizeHint(QtCore.QSize(100,100))
                 self.plist.addItem(pitem)
-                self.waitlist.append(item)
+                self.waitlist.append(os.path.splitext(item)[0])
                 # self.rlist.addItem(pitem)
         
 
@@ -86,54 +86,13 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
         # res.paste(p2,(0,p1.size[1]))
         # print(res.size)
         # res.save('new.jpg')
+        pass
         
-        rows = 0#有图的行数
-        cols = None #暂存上一行的图数量 列数
         
-        for i in range(len(self.worklist)):
-            if self.worklist[i].count(None) != 3:
-                rows+=1
-                if not cols:
-                    cols = 3-self.worklist[i].count(None)
-                else:
-                    if 3-self.worklist[i].count(None)!= cols:
-                        QMessageBox.about(self,"提示","图片数量不符合要求")
-                        return
-        
-        if rows == 0:
-            QMessageBox.about(self,"提示","无图片")
-            return
-            
-                        
-        img = Image.open('wait-to-merge/'+self.worklist[0][0],'r')
-        format_ = img.format
-        width = img.size[0]
-        height = img.size[1]
 
-        IMAGES_PATH = 'wait-to-merge\\'
-        IMAGE_SAVE_PATH = 'results\\'
-        to_image = Image.new('RGB', (cols * width, rows * height))  # 创建一个新图
-        # 循环遍历，把每张图片按顺序粘贴到对应位置上
-        for x in range(rows):
-            for y in range(cols):
-                from_image = Image.open(IMAGES_PATH + self.worklist[x][y]).resize(
-                    (width, height), Image.ANTIALIAS)
-                to_image.paste(from_image, (y * width, x * height))
-        
-        fileno = len(os.listdir('results'))
-        to_image.save(IMAGE_SAVE_PATH + str(fileno) + '.' + format_)  # 保存新图
-        print('新图片生成')
-        
-        self.worklist = [[None,None,None],
-                         [None,None,None],
-                         [None,None,None]] 
-        
-        self.rlist.clearContents()
-        
 class rlist(QTableWidget):
     def __init__(self,parent=None):
         super().__init__(parent) 
-        self.window = parent
         self.setAcceptDrops(True)
         # self.setDragEnabled(True)
         self.setRowCount(3)#设置表格的行数
@@ -147,7 +106,7 @@ class rlist(QTableWidget):
         self.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
        
     def dragEnterEvent(self, event):
-        # event.setDropAction(Qt.MoveAction)
+        event.setDropAction(Qt.MoveAction)
         # 接受事件 将事件转到dropevent
         event.accept()
     
@@ -156,18 +115,15 @@ class rlist(QTableWidget):
         y = event.pos().y()
         row,col = self.whichgrid(x, y)
         
-        icon = self.window.worklist[row][col]
-        self.window.waitlist.insert(0, icon)
-        
-        pic = QPixmap('wait-to-merge/'+icon)
-        pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(120,120))), icon)
-        pitem.setSizeHint(QtCore.QSize(100,100))
-        self.window.plist.insertItem(0, pitem)
+        icon = self.item(row, col)
         
         
         empty = QTableWidgetItem('')
         
         self.setItem(row, col, empty)
+        
+        
+        
         
     def dropEvent(self, event):
         source_Widget=event.source()#获取拖入元素的父组件
@@ -184,9 +140,6 @@ class rlist(QTableWidget):
         
         newItem = QTableWidgetItem(icon,'')
         self.setItem(row, col, newItem)
-        self.window.worklist[row][col] = items[0].text()
-        self.window.waitlist.remove(items[0].text())
-        source_Widget.takeItem(source_Widget.currentRow())
         
     def whichgrid(self, x, y):
         size = int(self.size().width()/3)
@@ -201,5 +154,3 @@ if __name__ == "__main__":
     win = Mainwindow()
     win.show()
     sys.exit(app.exec_())
-    
-    #TODO:设置撤销缓存区 右端图片可换位
