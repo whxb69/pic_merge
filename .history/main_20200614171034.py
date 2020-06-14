@@ -11,12 +11,10 @@ import time
 import os
 import PyQt5.sip
 import sip
-import shutil
 
 cgitb.enable()
 
 IMAGES_PATH = 'wait-to-merge\\'
-MERGED_PATH = 'merged\\'
 IMAGE_SAVE_PATH = 'results\\'
         
 class Mainwindow(QMainWindow, Ui_MainWindow):
@@ -34,17 +32,11 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
         self.btn_go = QPushButton(self)
         self.btn_go.setText("合并")
         self.btn_go.clicked.connect(self.merge)
-        self.btn_go.move(self.rlist.x()+self.rlist.width()*0.2, self.rlist.y()-50)
+        self.btn_go.move(self.rlist.x()+self.rlist.width()*0.4, self.rlist.y()-50)
+        # self.btn_go.move(500, 50)
         self.btn_go.show()
         
-        self.btn_back = QPushButton(self)
-        self.btn_back.setText("撤销上一张")
-        self.btn_back.clicked.connect(self.back)
-        self.btn_back.move(self.rlist.x()+self.rlist.width()*0.6, self.rlist.y()-50)
-        self.btn_back.show()
-        self.btn_back.setEnabled(False)
         
-        self.cache = []
         
         if not os.path.isdir('merged'):
             os.makedirs('merged')
@@ -77,13 +69,14 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
         #将图片加入工作列表
         for item in os.listdir('wait-to-merge'):
             if is_img(os.path.splitext(item)[1]):
-                pic = QPixmap(IMAGES_PATH+item)
-                pic.scaled(QtCore.QSize(150,150))
-                pitem = QListWidgetItem(QIcon(pic), item)
+                pic = QPixmap('wait-to-merge/'+item)
+                pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(120,120))), item)
+                pitem.setSizeHint(QtCore.QSize(100,100))
                 self.plist.addItem(pitem)
                 self.waitlist.append(item)
                 # self.rlist.addItem(pitem)
         
+
     def merge(self):   
         rows = 0#有图的行数
         cols = None #暂存上一行的图数量 列数
@@ -104,7 +97,6 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
             
                         
         img = Image.open('wait-to-merge/'+self.worklist[0][0],'r')
-        img.close()
         format_ = img.format
         width = img.size[0]
         height = img.size[1]
@@ -115,10 +107,6 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
             for y in range(cols):
                 from_image = Image.open(IMAGES_PATH + self.worklist[x][y]).resize(
                     (width, height), Image.ANTIALIAS)
-                
-                if os.path.isfile(IMAGES_PATH + self.worklist[x][y]):
-                    shutil.move(IMAGES_PATH + self.worklist[x][y], MERGED_PATH +self.worklist[x][y])
-                self.cache.append(self.worklist[x][y])
                 to_image.paste(from_image, (y * width, x * height))
         
         fileno = len(os.listdir('results'))
@@ -130,20 +118,6 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
                          [None,None,None]] 
         
         self.rlist.clearContents()
-        self.btn_back.setEnabled(True)
-    
-    def back(self):
-        for pic in self.cache:
-            if os.path.isfile(MERGED_PATH+pic):
-                shutil.move(MERGED_PATH+pic, IMAGES_PATH+pic)
-            
-            icon = QPixmap(IMAGES_PATH+pic)
-            icon.scaled(QtCore.QSize(150,150))
-            pitem = QListWidgetItem(QIcon(icon), pic)
-            self.plist.insertItem(0, pitem)
-            self.waitlist.insert(0, pic)
-        self.cache = []
-        self.btn_back.setEnabled(False)
         
 class rlist(QTableWidget):
     def __init__(self,parent=None):
@@ -175,7 +149,7 @@ class rlist(QTableWidget):
         self.window.waitlist.insert(0, icon)
         
         pic = QPixmap('wait-to-merge/'+icon)
-        pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(150,150))), icon)
+        pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(120,120))), icon)
         pitem.setSizeHint(QtCore.QSize(100,100))
         self.window.plist.insertItem(0, pitem)
         
@@ -198,10 +172,11 @@ class rlist(QTableWidget):
         row,col = self.whichgrid(x, y)
         print(row, col)
         
+        newItem = QTableWidgetItem(icon,'')
+        self.setItem(row, col, newItem)
+        self.window.worklist[row][col] = item.text()
+        
         if source_Widget.objectName() == 'yuantu':
-            newItem = QTableWidgetItem(icon,None)
-            self.setItem(row, col, newItem)
-            self.window.worklist[row][col] = item.text()
             self.window.waitlist.remove(item.text())
             source_Widget.takeItem(source_Widget.currentRow())
         elif source_Widget.objectName() == 'pintu':
@@ -209,15 +184,16 @@ class rlist(QTableWidget):
             srow = source_Widget.row(source_Widget.selectedItems()[0])
             scol = source_Widget.column(source_Widget.selectedItems()[0])
             if self.window.worklist[srow][scol]:
-                sitem = QTableWidgetItem(QIcon(IMAGES_PATH+self.window.worklist[srow][scol]),None)
+                sitem = QTableWidgetItem(QIcon(IMAGES_PATH+self.window.worklist[srow][scol]),'')
                 if self.window.worklist[row][col]:
-                    titem = QTableWidgetItem(QIcon(IMAGES_PATH+self.window.worklist[row][col]),None)
+                    titem = QTableWidgetItem(QIcon(IMAGES_PATH+self.window.worklist[row][col]),'')
                 else:
-                    titem = QTableWidgetItem(None)
+                    titem = QTableWidgetItem('')
                 self.setItem(row, col, sitem)
                 self.setItem(srow, scol, titem)
                 self.window.worklist[row][col], self.window.worklist[srow][scol] = \
                     self.window.worklist[srow][scol], self.window.worklist[row][col]
+            
         return 
         
         
@@ -235,3 +211,4 @@ if __name__ == "__main__":
     win.show()
     sys.exit(app.exec_())
     
+    #TODO:设置撤销缓存区 右端图片可换位

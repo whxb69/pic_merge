@@ -11,12 +11,10 @@ import time
 import os
 import PyQt5.sip
 import sip
-import shutil
 
 cgitb.enable()
 
 IMAGES_PATH = 'wait-to-merge\\'
-MERGED_PATH = 'merged\\'
 IMAGE_SAVE_PATH = 'results\\'
         
 class Mainwindow(QMainWindow, Ui_MainWindow):
@@ -77,9 +75,9 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
         #将图片加入工作列表
         for item in os.listdir('wait-to-merge'):
             if is_img(os.path.splitext(item)[1]):
-                pic = QPixmap(IMAGES_PATH+item)
-                pic.scaled(QtCore.QSize(150,150))
-                pitem = QListWidgetItem(QIcon(pic), item)
+                pic = QPixmap('wait-to-merge/'+item)
+                pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(120,120))), item)
+                pitem.setSizeHint(QtCore.QSize(100,100))
                 self.plist.addItem(pitem)
                 self.waitlist.append(item)
                 # self.rlist.addItem(pitem)
@@ -104,7 +102,6 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
             
                         
         img = Image.open('wait-to-merge/'+self.worklist[0][0],'r')
-        img.close()
         format_ = img.format
         width = img.size[0]
         height = img.size[1]
@@ -115,10 +112,6 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
             for y in range(cols):
                 from_image = Image.open(IMAGES_PATH + self.worklist[x][y]).resize(
                     (width, height), Image.ANTIALIAS)
-                
-                if os.path.isfile(IMAGES_PATH + self.worklist[x][y]):
-                    shutil.move(IMAGES_PATH + self.worklist[x][y], MERGED_PATH +self.worklist[x][y])
-                self.cache.append(self.worklist[x][y])
                 to_image.paste(from_image, (y * width, x * height))
         
         fileno = len(os.listdir('results'))
@@ -130,20 +123,9 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
                          [None,None,None]] 
         
         self.rlist.clearContents()
-        self.btn_back.setEnabled(True)
     
     def back(self):
-        for pic in self.cache:
-            if os.path.isfile(MERGED_PATH+pic):
-                shutil.move(MERGED_PATH+pic, IMAGES_PATH+pic)
-            
-            icon = QPixmap(IMAGES_PATH+pic)
-            icon.scaled(QtCore.QSize(150,150))
-            pitem = QListWidgetItem(QIcon(icon), pic)
-            self.plist.insertItem(0, pitem)
-            self.waitlist.insert(0, pic)
-        self.cache = []
-        self.btn_back.setEnabled(False)
+        
         
 class rlist(QTableWidget):
     def __init__(self,parent=None):
@@ -175,7 +157,7 @@ class rlist(QTableWidget):
         self.window.waitlist.insert(0, icon)
         
         pic = QPixmap('wait-to-merge/'+icon)
-        pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(150,150))), icon)
+        pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(120,120))), icon)
         pitem.setSizeHint(QtCore.QSize(100,100))
         self.window.plist.insertItem(0, pitem)
         
@@ -235,3 +217,4 @@ if __name__ == "__main__":
     win.show()
     sys.exit(app.exec_())
     
+    #TODO:设置撤销缓存区 右端图片可换位

@@ -78,8 +78,8 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
         for item in os.listdir('wait-to-merge'):
             if is_img(os.path.splitext(item)[1]):
                 pic = QPixmap(IMAGES_PATH+item)
-                pic.scaled(QtCore.QSize(150,150))
-                pitem = QListWidgetItem(QIcon(pic), item)
+                pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(120,120))), item)
+                pitem.setSizeHint(QtCore.QSize(100,100))
                 self.plist.addItem(pitem)
                 self.waitlist.append(item)
                 # self.rlist.addItem(pitem)
@@ -104,7 +104,6 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
             
                         
         img = Image.open('wait-to-merge/'+self.worklist[0][0],'r')
-        img.close()
         format_ = img.format
         width = img.size[0]
         height = img.size[1]
@@ -117,7 +116,7 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
                     (width, height), Image.ANTIALIAS)
                 
                 if os.path.isfile(IMAGES_PATH + self.worklist[x][y]):
-                    shutil.move(IMAGES_PATH + self.worklist[x][y], MERGED_PATH +self.worklist[x][y])
+                    shutil.move(IMAGES_PATH + self.worklist[x][y], MERGED_PATH +s elf.worklist[x][y])
                 self.cache.append(self.worklist[x][y])
                 to_image.paste(from_image, (y * width, x * height))
         
@@ -138,10 +137,8 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
                 shutil.move(MERGED_PATH+pic, IMAGES_PATH+pic)
             
             icon = QPixmap(IMAGES_PATH+pic)
-            icon.scaled(QtCore.QSize(150,150))
-            pitem = QListWidgetItem(QIcon(icon), pic)
+            pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(120,120))), icon)
             self.plist.insertItem(0, pitem)
-            self.waitlist.insert(0, pic)
         self.cache = []
         self.btn_back.setEnabled(False)
         
@@ -175,7 +172,7 @@ class rlist(QTableWidget):
         self.window.waitlist.insert(0, icon)
         
         pic = QPixmap('wait-to-merge/'+icon)
-        pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(150,150))), icon)
+        pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(120,120))), icon)
         pitem.setSizeHint(QtCore.QSize(100,100))
         self.window.plist.insertItem(0, pitem)
         
@@ -235,3 +232,4 @@ if __name__ == "__main__":
     win.show()
     sys.exit(app.exec_())
     
+    #TODO:设置撤销缓存区 右端图片可换位

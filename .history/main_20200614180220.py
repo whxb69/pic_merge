@@ -77,9 +77,9 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
         #将图片加入工作列表
         for item in os.listdir('wait-to-merge'):
             if is_img(os.path.splitext(item)[1]):
-                pic = QPixmap(IMAGES_PATH+item)
+                pic = QIcon(QPixmap(IMAGES_PATH+item))
                 pic.scaled(QtCore.QSize(150,150))
-                pitem = QListWidgetItem(QIcon(pic), item)
+                pitem = QListWidgetItem(pic, item)
                 self.plist.addItem(pitem)
                 self.waitlist.append(item)
                 # self.rlist.addItem(pitem)
@@ -235,3 +235,4 @@ if __name__ == "__main__":
     win.show()
     sys.exit(app.exec_())
     
+    #TODO:设置撤销缓存区 右端图片可换位
