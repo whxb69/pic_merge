@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QAction, QListView,QListWidget
+from PyQt5.QtCore import QSize
 
 
 class Ui_MainWindow(object):
@@ -31,6 +32,7 @@ class Ui_MainWindow(object):
         self.plist.setAcceptDrops(False)
         self.plist.setDragEnabled(True)
         self.plist.setObjectName('yuantu')
+        self.plist.setIconSize(QSize(100,100))
         
 
         # self.rlist = QListWidget(self)
@@ -44,4 +46,4 @@ class Ui_MainWindow(object):
         
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "图片拼接"))

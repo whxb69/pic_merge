@@ -78,7 +78,7 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
         for item in os.listdir('wait-to-merge'):
             if is_img(os.path.splitext(item)[1]):
                 pic = QPixmap(IMAGES_PATH+item)
-                pic.scaled(QtCore.QSize(150,150))
+                # pic.scaled(QtCore.QSize(150,150))
                 pitem = QListWidgetItem(QIcon(pic), item)
                 self.plist.addItem(pitem)
                 self.waitlist.append(item)
@@ -102,7 +102,6 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
             QMessageBox.about(self,"提示","无图片")
             return
             
-                        
         img = Image.open('wait-to-merge/'+self.worklist[0][0],'r')
         img.close()
         format_ = img.format
@@ -172,21 +171,24 @@ class rlist(QTableWidget):
         row,col = self.whichgrid(x, y)
         
         icon = self.window.worklist[row][col]
-        self.window.waitlist.insert(0, icon)
-        
-        pic = QPixmap('wait-to-merge/'+icon)
-        pitem = QListWidgetItem(QtGui.QIcon(pic.scaled(QtCore.QSize(150,150))), icon)
-        pitem.setSizeHint(QtCore.QSize(100,100))
-        self.window.plist.insertItem(0, pitem)
-        
-        
-        empty = QTableWidgetItem('')
-        
-        self.setItem(row, col, empty)
+        if icon:
+            self.window.waitlist.insert(0, icon)
+            
+            pic = QPixmap('wait-to-merge/'+icon)
+            pitem = QListWidgetItem(QIcon(pic), icon)
+            self.window.plist.insertItem(0, pitem)
+            
+            
+            empty = QTableWidgetItem('')
+            
+            self.setItem(row, col, empty)
+            self.window.worklist[row][col] = None
         
     def dropEvent(self, event):
         source_Widget=event.source()#获取拖入元素的父组件
         items=source_Widget.selectedItems()
+        if not items:
+            return
         item = items[0]
         icon = item.icon()
         
@@ -220,7 +222,6 @@ class rlist(QTableWidget):
                     self.window.worklist[srow][scol], self.window.worklist[row][col]
         return 
         
-        
     def whichgrid(self, x, y):
         size = int(self.size().width()/3)
         row = y//size
@@ -232,6 +233,7 @@ if __name__ == "__main__":
     tagw = 180 * math.sqrt(app.desktop().width() / 3840)
     tagh = 50 * math.sqrt(app.desktop().height() / 2160)
     win = Mainwindow()
+    win.setWindowTitle('图片拼接')
     win.show()
     sys.exit(app.exec_())
     
