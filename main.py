@@ -29,6 +29,18 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
         self.rlist.setGeometry(0.45*self.screenWidth+50,0.15*self.screenHeight,
                                 0.42*self.screenWidth,0.42*self.screenWidth)
         self.rlist.setObjectName('pintu')
+        
+        #建立各目录
+        if not os.path.isdir('merged'):
+            os.makedirs('merged')
+        
+        if not os.path.isdir('wait-to-merge'):
+            os.makedirs('wait-to-merge')
+        
+        if not os.path.isdir('results'):
+            os.makedirs('results')
+            
+            
         self.setpics()
         
         self.btn_go = QPushButton(self)
@@ -45,15 +57,6 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
         self.btn_back.setEnabled(False)
         
         self.cache = []
-        
-        if not os.path.isdir('merged'):
-            os.makedirs('merged')
-        
-        if not os.path.isdir('wait-to-merge'):
-            os.makedirs('wait-to-merge')
-        
-        if not os.path.isdir('results'):
-            os.makedirs('results')
     
     def mouseMoveEvnet(self, event):
         super().mouseMoveEvnet(event)
