@@ -24,7 +24,19 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
         super(Mainwindow, self).__init__(parent)
         self.setupUi(self)
         self.setMouseTracking(True)
+        
+        self.plist = plist(self)
+        self.plist.setGeometry(20,20,0.45*self.screenWidth,0.95*self.screenHeight)
+        self.plist.setViewMode(QListWidget.IconMode)
+        self.plist.setMovement(QListWidget.Free)
+        self.plist.setSpacing(10)
+        self.plist.setAcceptDrops(True)
+        self.plist.setDragEnabled(True)
+        self.plist.setObjectName('yuantu')
+        self.plist.setIconSize(QSize(100,100))
+        
         self.rlist = rlist(self)
+        
         # self.rlist.setMouseTracking(True)
         self.rlist.setGeometry(0.45*self.screenWidth+50,0.15*self.screenHeight,
                                 0.42*self.screenWidth,0.42*self.screenWidth)
@@ -104,7 +116,8 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
         if rows == 0:
             QMessageBox.about(self,"提示","无图片")
             return
-            
+        
+        self.cache = []
         img = Image.open('wait-to-merge/'+self.worklist[0][0],'r')
         img.close()
         format_ = img.format
@@ -146,6 +159,37 @@ class Mainwindow(QMainWindow, Ui_MainWindow):
             self.waitlist.insert(0, pic)
         self.cache = []
         self.btn_back.setEnabled(False)
+
+class plist(QListWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent) 
+        self.window = parent
+        
+        
+    def dragEnterEvent(self, event):
+        source_Widget=event.source()
+        if source_Widget.objectName() == 'pintu':
+            event.accept()
+            
+    def dropEvent(self, event):
+        items = event.source().selectedItems()
+        item = items[0]
+        row = item.row()
+        col = item.column()
+        
+        icon = self.window.worklist[row][col]
+        if icon:
+            self.window.waitlist.insert(0, icon)
+            
+            pic = QPixmap('wait-to-merge/'+icon)
+            pitem = QListWidgetItem(QIcon(pic), icon)
+            self.window.plist.insertItem(0, pitem)
+            
+            
+            empty = QTableWidgetItem('')
+            
+            event.source().setItem(row, col, empty)
+            self.window.worklist[row][col] = None
         
 class rlist(QTableWidget):
     def __init__(self,parent=None):

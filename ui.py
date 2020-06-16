@@ -23,16 +23,8 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         MainWindow.setCentralWidget(self.centralwidget)
         self.centralwidget.setMouseTracking(True)
-
-        self.plist = QListWidget(self)
-        self.plist.setGeometry(20,20,0.45*self.screenWidth,0.95*self.screenHeight)
-        self.plist.setViewMode(QListWidget.IconMode)
-        self.plist.setMovement(QListWidget.Free)
-        self.plist.setSpacing(10)
-        self.plist.setAcceptDrops(False)
-        self.plist.setDragEnabled(True)
-        self.plist.setObjectName('yuantu')
-        self.plist.setIconSize(QSize(100,100))
+        
+        
         
 
         # self.rlist = QListWidget(self)
